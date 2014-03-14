@@ -91,12 +91,15 @@ public class JavascriptVariableValueSource extends JavascriptValueSource impleme
   }
 
   public void validateScript() throws EvaluatorException {
+    if(!valueTable.isView()) {
+      log.trace("Skip table variable {} script validation", variable.getName());
+      return;
+    }
     Value tableLastUpdate = valueTable.getTimestamps().getLastUpdate();
     if(lastScriptValidation == null || !lastScriptValidation.equals(tableLastUpdate)) {
       log.trace("Validate {} script", variable.getName());
       initialiseIfNot();
-      //OPAL-2546 commented until this issue is resolved
-      //new VariableScriptValidator(variable, valueTable).validateScript();
+      new VariableScriptValidator(variable, valueTable).validateScript();
       lastScriptValidation = valueTable.getTimestamps().getLastUpdate();
     } else {
       log.trace("Skip {} script validation", variable.getName());

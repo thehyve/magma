@@ -24,11 +24,13 @@ import org.obiba.magma.datasource.fs.FsDatasource;
 import org.obiba.magma.datasource.generated.GeneratedValueTable;
 import org.obiba.magma.datasource.mongodb.MongoDBDatasourceFactory;
 import org.obiba.magma.js.AbstractJsTest;
+import org.obiba.magma.js.JavascriptVariableBuilder;
 import org.obiba.magma.js.JavascriptVariableValueSource;
 import org.obiba.magma.js.views.VariablesClause;
 import org.obiba.magma.support.DatasourceCopier;
 import org.obiba.magma.support.Initialisables;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.magma.type.TextType;
 import org.obiba.magma.views.DefaultViewManagerImpl;
 import org.obiba.magma.views.MemoryViewPersistenceStrategy;
 import org.obiba.magma.views.View;
@@ -57,13 +59,17 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
 
   private static final String DATASOURCE = "ds";
 
-  private static final String TABLE = "table";
+  private static final String TABLE_1 = "table_1";
+
+  private static final String TABLE_2 = "table_2";
 
   private static final String VARIABLE_AGE = "age";
 
   private static final String VARIABLE_WEIGHT = "weight";
 
   private static final String VARIABLE_HEIGHT = "height";
+
+  private static final String VARIABLE_GENDER = "gender";
 
   private ViewManager viewManager;
 
@@ -99,19 +105,24 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
     DatasourceFactory factory = new MongoDBDatasourceFactory(DATASOURCE, MONGO_DB_URL);
     Datasource datasource = factory.create();
 
-    List<Variable> variables = Lists.newArrayList( //
+    Datasource viewAwareDatasource = viewManager.decorate(datasource);
+    MagmaEngine.get().addDatasource(viewAwareDatasource);
+
+    List<Variable> table1Variables = Lists.newArrayList( //
         newVariable(VARIABLE_AGE, IntegerType.get(), PARTICIPANT).addAttribute("min", "25").addAttribute("max", "90")
-            .build(), //
+            .addAttribute(JavascriptVariableBuilder.SCRIPT_ATTRIBUTE_NAME, "$('unknown-ref')").build(), //
         newVariable(VARIABLE_WEIGHT, IntegerType.get(), PARTICIPANT).unit("kg").addAttribute("min", "50")
             .addAttribute("max", "120").build(), //
         newVariable(VARIABLE_HEIGHT, IntegerType.get(), PARTICIPANT).unit("cm").addAttribute("min", "150")
             .addAttribute("max", "200").build());
-    ValueTable generatedValueTable = new GeneratedValueTable(datasource, variables, 10);
+    DatasourceCopier.Builder.newCopier().build()
+        .copy(new GeneratedValueTable(datasource, table1Variables, 10), TABLE_1, datasource);
 
-    Datasource viewAwareDatasource = viewManager.decorate(datasource);
-    MagmaEngine.get().addDatasource(viewAwareDatasource);
-
-    DatasourceCopier.Builder.newCopier().build().copy(generatedValueTable, TABLE, datasource);
+    List<Variable> table2Variables = Lists.newArrayList( //
+        newVariable(VARIABLE_GENDER, TextType.get(), PARTICIPANT).addCategory("Male", "M").addCategory("Female", "F")
+            .addAttribute(JavascriptVariableBuilder.SCRIPT_ATTRIBUTE_NAME, "$('unknown-ref')").build());
+    DatasourceCopier.Builder.newCopier().build()
+        .copy(new GeneratedValueTable(datasource, table2Variables, 10), TABLE_2, datasource);
 
     return viewAwareDatasource;
   }
@@ -129,9 +140,9 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
   }
 
   @Test
-  public void test_validate_bmi_script() throws Exception {
+  public void test_validate_bmi_script_with_full_path_ref() throws Exception {
     Datasource datasource = getTestDatasource();
-    ValueTable table = datasource.getValueTable(TABLE);
+    ValueTable table = datasource.getValueTable(TABLE_1);
 
     Variable weight_in_kg = createIntVariable("weight_in_kg", "$('ds.table:weight')");
     Variable height_in_cm = createIntVariable("height_in_cm", "$('ds.table:height')");
@@ -161,9 +172,60 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
   }
 
   @Test
+  public void test_validate_bmi_script_with_simple_path_ref() throws Exception {
+    Datasource datasource = getTestDatasource();
+
+    Variable weight_in_kg = createIntVariable("weight", "$('weight')");
+    Variable height_in_cm = createIntVariable("height", "$('height')");
+    Variable height_in_m = createDecimalVariable("height_in_m", "$this('height') / 100");
+    Variable weight_in_lbs = createIntVariable("weight_in_lbs", "$this('weight') * 2.20462");
+    Variable height_in_inches = createIntVariable("height_in_inches", "$this('height') * 0.393701");
+    Variable bmi_metric = createDecimalVariable("bmi_metric",
+        "$this('weight') / ($this('height_in_m') * $this('height_in_m'))");
+    Variable bmi = createDecimalVariable("bmi",
+        "$this('weight_in_lbs') / ($this('height_in_inches') * $this('height_in_inches')) * 703");
+
+    Collection<Variable> variables = Lists
+        .newArrayList(weight_in_kg, height_in_cm, height_in_m, bmi_metric, weight_in_lbs, height_in_inches, bmi);
+
+    View viewTemplate = View.Builder
+        .newView("view", datasource.getValueTable(TABLE_1), datasource.getValueTable(TABLE_2))
+        .list(new VariablesClause()).build();
+    try(ValueTableWriter.VariableWriter variableWriter = viewTemplate.getListClause().createWriter()) {
+      for(Variable variable : variables) {
+        variableWriter.writeVariable(variable);
+      }
+    }
+    viewManager.addView(DATASOURCE, viewTemplate, null);
+
+    View view = viewManager.getView(DATASOURCE, "view");
+
+    validateJavascriptValueSource(view, "bmi_metric");
+    validateJavascriptValueSource(view, "bmi");
+  }
+
+  @Test
+  public void test_skip_validation_for_table_variable_script() throws Exception {
+    Datasource datasource = getTestDatasource();
+
+    Variable gender = createIntVariable("gender", "$('gender')");
+    View viewTemplate = View.Builder
+        .newView("view", datasource.getValueTable(TABLE_1), datasource.getValueTable(TABLE_2))
+        .list(new VariablesClause()).build();
+    try(ValueTableWriter.VariableWriter variableWriter = viewTemplate.getListClause().createWriter()) {
+      variableWriter.writeVariable(gender);
+    }
+    viewManager.addView(DATASOURCE, viewTemplate, null);
+
+    View view = viewManager.getView(DATASOURCE, "view");
+
+    validateJavascriptValueSource(view, "gender");
+  }
+
+  @Test
   public void test_validate_with_circular_dependencies() throws Exception {
     Datasource datasource = getTestDatasource();
-    ValueTable table = datasource.getValueTable(TABLE);
+    ValueTable table = datasource.getValueTable(TABLE_1);
 
     Variable varA = createIntVariable("A", "$('ds.view:B') + $('ds.view:F') + $('ds.view:C')");
     Variable varB = createIntVariable("B", "$('ds.view:F')");
@@ -193,9 +255,9 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
   }
 
   @Test
-  public void test_validate() throws Exception {
+  public void test_validate_full_ref() throws Exception {
     Datasource datasource = getTestDatasource();
-    ValueTable table = datasource.getValueTable(TABLE);
+    ValueTable table = datasource.getValueTable(TABLE_1);
 
     Variable varA = createIntVariable("A", "$('ds.view:B') + $('ds.view:C')");
     Variable varB = createIntVariable("B", "10");
@@ -220,7 +282,7 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
   @Test
   public void test_validate_with_self_reference() throws Exception {
     Datasource datasource = getTestDatasource();
-    ValueTable table = datasource.getValueTable(TABLE);
+    ValueTable table = datasource.getValueTable(TABLE_1);
 
     Variable circular = createIntVariable("circular", "$('ds.view:circular')");
     View viewTemplate = View.Builder.newView("view", table).list(new VariablesClause()).build();
@@ -241,7 +303,7 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
   @Test
   public void test_validate_with_missing_variable() throws Exception {
     Datasource datasource = getTestDatasource();
-    ValueTable table = datasource.getValueTable(TABLE);
+    ValueTable table = datasource.getValueTable(TABLE_1);
 
     Variable var = createIntVariable("var", "$('non-existing')");
     View viewTemplate = View.Builder.newView("view", table).list(new VariablesClause()).build();

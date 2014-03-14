@@ -21,6 +21,7 @@ import org.obiba.magma.NoSuchVariableException;
 import org.obiba.magma.Timestamps;
 import org.obiba.magma.Value;
 import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueSource;
 import org.obiba.magma.ValueTable;
 import org.obiba.magma.ValueType;
 import org.obiba.magma.Variable;
@@ -103,7 +104,6 @@ public class JoinTable implements ValueTable, Initialisable {
       }
     }
     this.tables = ImmutableList.copyOf(tables);
-    //analyseVariables();
   }
 
   @NotNull
@@ -395,7 +395,7 @@ public class JoinTable implements ValueTable, Initialisable {
       this.owners = owners;
     }
 
-    private VariableValueSource getWrapped(ValueTable table) {
+    private ValueSource getWrapped(ValueTable table) {
       return table.getVariableValueSource(variableName);
     }
 
@@ -420,6 +420,7 @@ public class JoinTable implements ValueTable, Initialisable {
       return true;
     }
 
+    @NotNull
     @Override
     public VectorSource asVectorSource() {
       return this;
@@ -467,9 +468,10 @@ public class JoinTable implements ValueTable, Initialisable {
     @NotNull
     private final Variable variable;
 
-    private List<Iterator<Value>> valueIterators = Lists.newArrayList();
+    private final List<Iterator<Value>> valueIterators = Lists.newArrayList();
 
-    private ValueIterator(SortedSet<VariableEntity> entities, List<ValueTable> owners, Variable variable) {
+    private ValueIterator(@NotNull SortedSet<VariableEntity> entities, @NotNull List<ValueTable> owners,
+        @NotNull Variable variable) {
       this.entities = entities;
       this.owners = owners;
       this.variable = variable;

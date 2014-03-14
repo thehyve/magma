@@ -274,13 +274,13 @@ public class GlobalMethodsMongoDbTest extends AbstractJsTest {
     Datasource datasource = getTestDatasource();
     ValueTable table = datasource.getValueTable(TABLE);
 
-    Variable weight_in_kg = createIntVariable("weight_in_kg", "$('ds.table:weight')");
+    Variable weight_in_kg = createIntVariable("weight", "$('weight')");
     Variable height_in_cm = createIntVariable("height_in_cm", "$('ds.table:height')");
     Variable height_in_m = createDecimalVariable("height_in_m", "$this('height_in_cm') / 100");
-    Variable weight_in_lbs = createIntVariable("weight_in_lbs", "$this('weight_in_kg') * 2.20462");
+    Variable weight_in_lbs = createIntVariable("weight_in_lbs", "$this('weight') * 2.20462");
     Variable height_in_inches = createIntVariable("height_in_inches", "$this('height_in_cm') * 0.393701");
     Variable bmi_metric = createDecimalVariable("bmi_metric",
-        "$this('weight_in_kg') / ($this('height_in_m') * $this('height_in_m'))");
+        "$this('weight') / ($this('height_in_m') * $this('height_in_m'))");
     Variable bmi = createDecimalVariable("bmi",
         "$this('weight_in_lbs') / ($this('height_in_inches') * $this('height_in_inches')) * 703");
 
@@ -315,13 +315,13 @@ public class GlobalMethodsMongoDbTest extends AbstractJsTest {
     Datasource datasource = getTestDatasource();
     ValueTable table = datasource.getValueTable(TABLE);
 
-    Variable weight_in_kg = createIntVariable("weight_in_kg", "$('ds.table:weight')");
+    Variable weight_in_kg = createIntVariable("weight", "$('ds.table:weight')");
     Variable height_in_cm = createIntVariable("height_in_cm", "$('ds.table:height')");
     Variable height_in_m = createDecimalVariable("height_in_m", "$this('height_in_cm') / 100");
-    Variable weight_in_lbs = createIntVariable("weight_in_lbs", "$this('weight_in_kg') * 2.20462");
+    Variable weight_in_lbs = createIntVariable("weight_in_lbs", "$this('weight') * 2.20462");
     Variable height_in_inches = createIntVariable("height_in_inches", "$this('height_in_cm') * 0.393701");
     Variable bmi_metric = createDecimalVariable("bmi_metric",
-        "$this('weight_in_kg') / ($this('height_in_m') * $this('height_in_m'))");
+        "$this('weight') / ($this('height_in_m') * $this('height_in_m'))");
     Variable bmi = createDecimalVariable("bmi",
         "$this('weight_in_lbs') / ($this('height_in_inches') * $this('height_in_inches')) * 703");
 
