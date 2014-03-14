@@ -143,7 +143,7 @@ public abstract class AbstractTransformingValueTableWrapper extends AbstractValu
 
       @Override
       public VariableValueSource unapply(VariableValueSource from) {
-        return ((AbstractVariableValueSourceWrapper) from).getWrapped();
+        return ((org.obiba.magma.VariableValueSourceWrapper) from).getWrapped();
       }
     };
   }

@@ -208,7 +208,23 @@ public class VariableScriptValidatorTest extends AbstractJsTest {
   public void test_skip_validation_for_table_variable_script() throws Exception {
     Datasource datasource = getTestDatasource();
 
-    Variable gender = createIntVariable("gender", "$('gender')");
+    Variable gender = createTextVariable("gender", "$('gender')");
+    View viewTemplate = View.Builder.newView("view", datasource.getValueTable(TABLE_2)).list(new VariablesClause()).build();
+    try(ValueTableWriter.VariableWriter variableWriter = viewTemplate.getListClause().createWriter()) {
+      variableWriter.writeVariable(gender);
+    }
+    viewManager.addView(DATASOURCE, viewTemplate, null);
+
+    View view = viewManager.getView(DATASOURCE, "view");
+
+    validateJavascriptValueSource(view, "gender");
+  }
+
+  @Test
+  public void test_skip_validation_for_join_table_variable_script() throws Exception {
+    Datasource datasource = getTestDatasource();
+
+    Variable gender = createTextVariable("gender", "$('gender')");
     View viewTemplate = View.Builder
         .newView("view", datasource.getValueTable(TABLE_1), datasource.getValueTable(TABLE_2))
         .list(new VariablesClause()).build();

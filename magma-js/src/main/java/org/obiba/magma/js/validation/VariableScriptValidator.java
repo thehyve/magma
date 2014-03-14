@@ -74,7 +74,9 @@ public class VariableScriptValidator {
 
   private static void getVariableRefNode(@NotNull VariableRefNode callerNode) {
     String script = callerNode.getScript();
-    if(Strings.isNullOrEmpty(script)) {
+    if(callerNode.isTableVariable()) {
+      log.trace("Skip script validation for table variable {}", callerNode.getVariableRef());
+    } else if(Strings.isNullOrEmpty(script)) {
       log.trace("{} has no script", callerNode.getVariableRef());
     } else {
       log.trace("Analyze {} script: {}", callerNode.getVariableRef(), script);
@@ -246,7 +248,7 @@ public class VariableScriptValidator {
 
     private static void checkCircularDependencies(@Nullable VariableRefNode node,
         Collection<VariableRefNode> callersList) throws CircularVariableDependencyException {
-      if(node == null) return;
+      if(node == null || !node.getValueTable().isView()) return;
       if(callersList.contains(node)) {
         throw new CircularVariableDependencyException(node);
       }
@@ -274,5 +276,8 @@ public class VariableScriptValidator {
       return Objects.toStringHelper(this).omitNullValues().addValue(variableRef).add("callers", callers).toString();
     }
 
+    public boolean isTableVariable() {
+      return valueTable.isView();
+    }
   }
 }

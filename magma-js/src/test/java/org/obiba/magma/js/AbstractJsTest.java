@@ -15,6 +15,7 @@ import org.obiba.magma.Value;
 import org.obiba.magma.Variable;
 import org.obiba.magma.type.DecimalType;
 import org.obiba.magma.type.IntegerType;
+import org.obiba.magma.type.TextType;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -112,5 +113,9 @@ public abstract class AbstractJsTest {
 
   protected static Variable createDecimalVariable(String name, String script) {
     return new Variable.Builder(name, DecimalType.get(), PARTICIPANT).addAttribute("script", script).build();
+  }
+
+  protected static Variable createTextVariable(String name, String script) {
+    return new Variable.Builder(name, TextType.get(), PARTICIPANT).addAttribute("script", script).build();
   }
 }
