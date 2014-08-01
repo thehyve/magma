@@ -47,12 +47,34 @@ allprojects {
   buildDir = 'target'
 
   repositories {
+    maven { url 'http://repo.thehyve.nl/content/repositories/releases' }
     maven { url 'http://repo.obiba.org/repo' }
     mavenCentral()
     mavenLocal()
   }
 
-  tasks.withType(JavaCompile) {
+    task createPom << {
+        pom {
+            project {
+                //groupId 'org.example'
+                //artifactId 'test'
+                //version '1.0.0'
+
+                //inceptionYear '2008'
+                /*
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }*/
+            }
+        }.writeTo("pom.xml")
+    }
+
+
+    tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
   }
 
@@ -125,11 +147,17 @@ allprojects {
           issues.appendNode('system', 'jira')
           issues.appendNode('url', 'http://jira.obiba.org/jira/browse/MAGMA')
 
+            def scm = root.appendNode('scm')
+            scm.appendNode('url', 'https://github.com/thehyve/magma')
+            scm.appendNode('connection', 'scm:git:git://github.com/thehyve/magma.git')
+            scm.appendNode('developerConnection', 'scm:git:git://github.com/thehyve/magma.git')
+
+            /*
           def scm = root.appendNode('scm')
           scm.appendNode('url', 'https://github.com/obiba/magma')
           scm.appendNode('connection', 'scm:git:git://github.com/obiba/magma.git')
           scm.appendNode('developerConnection', 'scm:git:git://github.com/obiba/magma.git')
-
+            */
           def license = root.appendNode('licenses').appendNode('license');
           license.appendNode('name', 'GNU Public License version 3')
           license.appendNode('url', 'http://www.obiba.org/node/62')
@@ -145,6 +173,21 @@ allprojects {
     }
   }
 
+/*
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "https://repo.thehyve.nl/content/repositories") {
+                    //authentication(userName: "carlos", password: "admin123")
+                }
+                pom.version = project.version
+                pom.artifactId = "magma"
+                pom.groupId = 'org.obiba.magma'
+            }
+        }
+    }
+*/
+/*
   // configure artifactory plugin
   artifactory {
     contextUrl = 'http://repo.obiba.org'
@@ -166,7 +209,7 @@ allprojects {
       }
     }
   }
-
+*/
   sonarRunner {
     sonarProperties {
       property 'sonar.sourceEncoding', 'UTF-8'

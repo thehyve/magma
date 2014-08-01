@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.obiba.magma</groupId>
+  <artifactId>magma</artifactId>
+  <version>1.11-sesi</version>
+  <packaging>pom</packaging>
+
+    <modules>
+        <module>magma-api</module>
+        <module>magma-beans</module>
+        <module>magma-crypt</module>
+        <module>magma-data-generator</module>
+        <module>magma-datasource-csv</module>
+        <module>magma-datasource-excel</module>
+        <module>magma-datasource-fs</module>
+        <module>magma-datasource-hibernate</module>
+        <module>magma-datasource-jdbc</module>
+        <module>magma-datasource-limesurvey</module>
+        <module>magma-datasource-mongodb</module>
+        <module>magma-datasource-null</module>
+        <module>magma-datasource-spss</module>
+        <module>magma-filter</module>
+        <module>magma-integration</module>
+        <module>magma-js</module>
+        <module>magma-math</module>
+        <module>magma-security</module>
+        <module>magma-spring</module>
+        <module>magma-test</module>
+        <module>magma-xstream</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.obiba.commons</groupId>
+                <artifactId>obiba-core</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+
+        <repository>
+            <id>repo.thehyve.nl-releases</id>
+            <name>The Hyve Releases</name>
+            <url>https://repo.thehyve.nl/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!--
+        <repository>
+            <id>thehyve.snapshots</id>
+            <name>The Hyve Snapshots</name>
+            <url>repo.thehyve.nl-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        -->
+        <repository>
+            <id>obiba.org</id>
+            <name>Obiba Maven 2.x Repository</name>
+            <url>http://repo.obiba.org/repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+    </repositories>
+
+    <distributionManagement>
+
+        <repository>
+            <id>repo.thehyve.nl-releases</id>
+            <url>https://repo.thehyve.nl/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>repo.thehyve.nl-snapshots</id>
+            <url>http://repo.thehyve.nl/content/repositories/snapshots</url>
+        </snapshotRepository>
+
+    </distributionManagement>
+
+    <properties>
+
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+
+        <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+
+    </properties>
+
+</project>
