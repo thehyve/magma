@@ -69,6 +69,14 @@ class HibernateValueTableTransaction extends HibernateDatasourceSynchronization 
     }
   }
 
+  @Override
+  protected void rollback() {
+    super.rollback();
+    uncommittedEntities.clear();
+    uncommittedSources.clear();
+    uncommittedRemovedSources.clear();
+  }
+
   /**
    * Add a {@code VariableValueSource} to the list of uncommitted sources to be added after transaction completion.
    *

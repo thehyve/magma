@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 /**
@@ -381,6 +383,7 @@ public class HibernateDatasource extends AbstractDatasource {
       return Collections.emptyList();
     }
 
+    autoCleanSyncMap();
     Transaction tx = currentSession.getTransaction();
     if(tx != null) {
       List<HibernateValueTableTransaction> tableTxs = syncMap
@@ -391,6 +394,21 @@ public class HibernateDatasource extends AbstractDatasource {
       return tableTxs;
     } else {
       return Collections.emptyList();
+    }
+  }
+
+  private synchronized void autoCleanSyncMap() {
+    for (Map.Entry<Transaction, List<HibernateValueTableTransaction>> entry : syncMap.entrySet()) {
+      List<HibernateValueTableTransaction> txs = entry.getValue();
+      if (txs.size() > 0) {
+        List<HibernateValueTableTransaction> toRemove = Lists.newArrayList();
+        for (HibernateValueTableTransaction tx : txs) {
+          if (tx.isClosed()) toRemove.add(tx);
+        }
+        txs.removeAll(toRemove);
+      }
+
+      if (txs.isEmpty()) syncMap.remove(entry.getKey());
     }
   }
 
