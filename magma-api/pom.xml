@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma</artifactId>
-        <version>1.11-sesi</version>
+        <version>1.11.1-sesi-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -65,7 +65,7 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-test</artifactId>
-      <version>1.11-sesi</version>
+      <version>1.11.1-sesi-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     -->

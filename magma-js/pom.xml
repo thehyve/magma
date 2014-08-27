@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma</artifactId>
-        <version>1.11-sesi</version>
+        <version>1.11.1-sesi-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-data-generator</artifactId>
-      <version>1.11-sesi</version>
       <scope>test</scope>
     </dependency>
     -->
@@ -41,7 +40,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-test</artifactId>
-      <version>1.11-sesi</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -60,7 +58,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-mongodb</artifactId>
-      <version>1.11-sesi</version>
       <scope>test</scope>
     </dependency>
     -->
@@ -91,7 +88,6 @@
     <dependency>
       <groupId>org.obiba.commons</groupId>
       <artifactId>obiba-core</artifactId>
-      <version>1.6.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -103,7 +99,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-xstream</artifactId>
-      <version>1.11-sesi</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -115,7 +110,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-api</artifactId>
-      <version>1.11-sesi</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -127,7 +121,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-fs</artifactId>
-      <version>1.11-sesi</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -152,7 +145,6 @@
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-hibernate</artifactId>
-      <version>1.11-sesi</version>
       <scope>test</scope>
     </dependency>
     -->
