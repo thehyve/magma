@@ -169,7 +169,7 @@
     <repositories>
 
         <repository>
-            <id>repo.thehyve.nl-releases</id>
+            <id>thehyve.releases</id>
             <name>The Hyve Releases</name>
             <url>https://repo.thehyve.nl/content/repositories/releases</url>
             <releases>
@@ -179,11 +179,10 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!--
         <repository>
             <id>thehyve.snapshots</id>
             <name>The Hyve Snapshots</name>
-            <url>repo.thehyve.nl-snapshots</url>
+            <url>https://repo.thehyve.nl/content/repositories/snapshots</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -191,7 +190,6 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-        -->
         <repository>
             <id>obiba.org</id>
             <name>Obiba Maven 2.x Repository</name>
