@@ -40,8 +40,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
-      <version>1.9.5</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -61,14 +59,6 @@
       <version>2.0.3</version>
       <scope>compile</scope>
     </dependency>
-      <!--
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-test</artifactId>
-      <version>1.11.1-sesi-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    -->
     <dependency>
       <groupId>janino</groupId>
       <artifactId>janino</artifactId>
