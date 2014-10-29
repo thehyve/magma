@@ -1,12 +1,7 @@
 package org.obiba.magma.js.methods;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -57,7 +52,7 @@ public final class GlobalMethods extends AbstractGlobalMethodProvider {
    */
   private static final Set<String> GLOBAL_METHODS = ImmutableSet
       .of("$", "$val", "$value", "$created", "$lastupdate", "$this", "$join", "now", "log", "$var", "$variable", "$id",
-          "$identifier", "$group", "$groups", "newValue", "newSequence");
+          "$identifier", "$group", "$groups", "newValue", "newSequence", "setOf");
 
   @Override
   protected Set<String> getExposedMethods() {
@@ -107,25 +102,74 @@ public final class GlobalMethods extends AbstractGlobalMethodProvider {
    * @return an instance of {@code ScriptableValue}
    */
   public static ScriptableValue newSequence(Context cx, Scriptable thisObj, Object[] args, Function funObj) {
-    Object value = args[0];
-    ValueType valueType = args.length > 1 ? ValueType.Factory.forName((String) args[1]) : null;
-    List<Value> values = null;
-    if(value instanceof NativeArray) {
-      values = nativeArrayToValueList(valueType, (NativeArray) value);
-    } else {
-      values = new ArrayList<>();
-      values.add(valueType == null ? ValueType.Factory.newValue((Serializable) value) : valueType.valueOf(value));
-    }
-    if(valueType == null) {
-      if(values.isEmpty()) {
-        throw new IllegalArgumentException("cannot determine ValueType for null object");
-      }
-      valueType = values.get(0).getValueType();
-    }
-    return new ScriptableValue(thisObj, ValueType.Factory.newSequence(valueType, values));
+    ValueSequence seq = sequenceOf(args);
+    return new ScriptableValue(thisObj, seq);
   }
 
-  private static List<Value> nativeArrayToValueList(@Nullable ValueType valueType, NativeArray nativeArray) {
+    /**
+     * Creates a sequence of unique values.</br>
+     * If the args[0] is a ScriptableValue, creates a set sequence from its values.</br>
+     * If the args[0] is not a scriptable value, behaves exactly newSequence, but returning no duplicates.
+     *
+     * @param ctx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return ScriptableValue of ValueSequence without duplicate elements
+     */
+  public static ScriptableValue setOf(Context ctx, Scriptable thisObj, Object[] args, Function funObj) {
+    final List<Value> list;
+    final ValueSequence seq;
+
+    Object obj = args[0];
+    if (obj instanceof ScriptableValue) {
+        Value value = ((ScriptableValue) obj).getValue();
+        if (value.isSequence()) {
+            seq = value.asSequence();
+            list = value.asSequence().getValues();
+        } else {
+            list = new ArrayList<>();
+            list.add(value);
+            seq = value.getValueType().sequenceOf(list);
+        }
+    } else {
+        seq = sequenceOf(args);
+        list = seq.getValues();
+    }
+
+    Set<Value> set = new LinkedHashSet<>(list);
+
+    final ValueSequence resultSeq;
+    if (list.size() > set.size()) {
+        //there are some duplicates: create a new sequence from the set
+        resultSeq = seq.getValueType().sequenceOf(set);
+    } else {
+        resultSeq = seq;
+    }
+
+    return new ScriptableValue(thisObj, resultSeq);
+  }
+
+    private static ValueSequence sequenceOf(Object[] args) {
+        Object value = args[0];
+        ValueType valueType = args.length > 1 ? ValueType.Factory.forName((String) args[1]) : null;
+        List<Value> values = null;
+        if(value instanceof NativeArray) {
+            values = nativeArrayToValueList(valueType, (NativeArray) value);
+        } else {
+            values = new ArrayList<>();
+            values.add(valueType == null ? ValueType.Factory.newValue((Serializable) value) : valueType.valueOf(value));
+        }
+        if(valueType == null) {
+            if(values.isEmpty()) {
+                throw new IllegalArgumentException("cannot determine ValueType for null object");
+            }
+            valueType = values.get(0).getValueType();
+        }
+        return ValueType.Factory.newSequence(valueType, values);
+    }
+
+    private static List<Value> nativeArrayToValueList(@Nullable ValueType valueType, NativeArray nativeArray) {
     List<Value> newValues = new ArrayList<>();
     for(long i = 0; i < nativeArray.getLength(); i++) {
       Serializable serializable = (Serializable) nativeArray.get(i);
@@ -248,6 +292,7 @@ public final class GlobalMethods extends AbstractGlobalMethodProvider {
    * @return an instance of {@code ScriptableValue}
    */
   public static Scriptable $join(Context ctx, Scriptable thisObj, Object[] args, Function funObj) {
+
     if(args.length != 2) {
       throw new IllegalArgumentException(
           "$join() expects exactly two arguments: the reference the variable to be joined and the name of the variable holding entity identifiers.");
@@ -360,30 +405,71 @@ public final class GlobalMethods extends AbstractGlobalMethodProvider {
         : joinedSource.getValueType().nullValue();
     if(identifier.isSequence()) {
       if(identifier.asSequence().getSize() > 0) {
+        boolean needsFlatten = false;
+
         List<Value> joinedValues = Lists.newArrayList();
         for(Value id : identifier.asSequence().getValue()) {
-          joinedValues.add(getSingleJoinedValue(joinedTable, joinedSource, id, false));
+          Value target = getSingleJoinedValue(joinedTable, joinedSource, id);
+          joinedValues.add(target);
+          needsFlatten = target.isSequence(); //we need to flatten the results, as we have sequences within sequences
         }
-        value = joinedSource.getValueType().sequenceOf(joinedValues);
+
+        if (emptyOrNull(joinedValues)) {
+            //no values: empty sequence
+            value = joinedSource.getValueType().sequenceOf(Collections.<Value>emptyList());
+        } else {
+            //joining the values in a sequence
+            value = joinedSource.getValueType().sequenceOf(joinedValues);
+        }
+
+        if (needsFlatten) {
+          //create a flat sequence
+          List<Value> allValues = getAllSingleValues(value.asSequence());
+          value = value.getValueType().sequenceOf(allValues);
+        }
       }
     } else {
-      value = getSingleJoinedValue(joinedTable, joinedSource, identifier, true);
+      value = getSingleJoinedValue(joinedTable, joinedSource, identifier);
     }
 
     return value;
   }
 
+  private static boolean emptyOrNull(List<Value> values) {
+    return values.size() == 0 || (values.size() == 1 && values.get(0).isNull());
+  }
+
+    /**
+     * Recursively gets all the values in the given sequence
+     * @param seq
+     * @return list of values
+     */
+  public static List<Value> getAllSingleValues(ValueSequence seq) {
+      List<Value> list = new ArrayList<>();
+      extractSingleValues(seq, list);
+      return list;
+  }
+
+  private static void extractSingleValues(ValueSequence seq, List<Value> toAdd) {
+      for (Value v: seq.getValues()) {
+          if (v.isSequence()) {
+              extractSingleValues((ValueSequence)v, toAdd);
+          } else {
+              toAdd.add(v);
+          }
+      }
+  }
+
   /**
-   * Get a joined value where identifier must not be a sequence of identifiers.
+   * Get a joined value.
    *
    * @param joinedTable
    * @param joinedSource
    * @param identifier
-   * @param allowSequence
    * @return
    */
   private static Value getSingleJoinedValue(ValueTable joinedTable, VariableValueSource joinedSource,
-      Value identifier, boolean allowSequence) {
+      Value identifier) {
     Value value = identifier.isSequence()
         ? joinedSource.getValueType().nullSequence()
         : joinedSource.getValueType().nullValue();
@@ -391,7 +477,6 @@ public final class GlobalMethods extends AbstractGlobalMethodProvider {
       VariableEntity entity = new VariableEntityBean(joinedTable.getEntityType(), identifier.toString());
       if(joinedTable.hasValueSet(entity)) {
         value = joinedSource.getValue(joinedTable.getValueSet(entity));
-        value = allowSequence ? value : ensureValueNotSequence(value);
       }
     }
     return value;
