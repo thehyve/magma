@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.obiba.magma</groupId>
   <artifactId>magma</artifactId>
-  <version>1.11.1-sesi</version>
+  <version>1.11.2-sesi-SNAPSHOT</version>
   <packaging>pom</packaging>
 
     <modules>
@@ -245,7 +245,7 @@
         <connection>scm:git:git://github.com/thehyve/magma.git</connection>
         <developerConnection>scm:git:https://github.com/thehyve/magma.git</developerConnection>
         <url>https://github.com/thehyve/magma</url>
-        <tag>magma-1.11.1-sesi</tag>
+        <tag>master</tag>
     </scm>
 
     <properties>
