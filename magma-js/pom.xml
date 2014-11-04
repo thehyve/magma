@@ -24,13 +24,6 @@
       <version>1.9.5</version>
       <scope>test</scope>
     </dependency>
-      <!--
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-data-generator</artifactId>
-      <scope>test</scope>
-    </dependency>
-    -->
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
@@ -54,13 +47,6 @@
       <version>1.1.1</version>
       <scope>test</scope>
     </dependency>
-      <!--
-    <dependency>
-      <groupId>org.obiba.magma</groupId>
-      <artifactId>magma-datasource-mongodb</artifactId>
-      <scope>test</scope>
-    </dependency>
-    -->
     <dependency>
       <groupId>net.sourceforge.findbugs</groupId>
       <artifactId>annotations</artifactId>
@@ -141,13 +127,19 @@
       <version>5.1.29</version>
       <scope>test</scope>
     </dependency>
-
+      <!--
     <dependency>
       <groupId>org.obiba.magma</groupId>
       <artifactId>magma-datasource-hibernate</artifactId>
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.obiba.magma</groupId>
+      <artifactId>magma-datasource-mongodb</artifactId>
+      <scope>test</scope>
+    </dependency>
+        -->
     <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
