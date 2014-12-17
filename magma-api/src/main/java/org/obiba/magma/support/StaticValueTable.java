@@ -5,7 +5,18 @@ import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
-import org.obiba.magma.*;
+import org.obiba.magma.AbstractVariableValueSource;
+import org.obiba.magma.Datasource;
+import org.obiba.magma.NoSuchValueSetException;
+import org.obiba.magma.Timestamps;
+import org.obiba.magma.Value;
+import org.obiba.magma.ValueSet;
+import org.obiba.magma.ValueSource;
+import org.obiba.magma.ValueType;
+import org.obiba.magma.Variable;
+import org.obiba.magma.VariableEntity;
+import org.obiba.magma.VectorSource;
+import org.obiba.magma.VectorSourceNotSupportedException;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
@@ -124,18 +135,7 @@ public class StaticValueTable extends AbstractValueTable {
         @NotNull
         @Override
         public Value getValue(ValueSet valueSet) {
-            Map<String, Object> entity = table.get(valueSet.getVariableEntity().getIdentifier());
-            if (entity == null) {
-                //returns Value.NULL if entity doesn't exist
-                return type.nullValue();
-            }
-            Object obj = entity.get(variable);
-            if (obj instanceof ValueSequence) {
-                //no need to convert it if its already a ValueSequence
-                return (Value)obj;
-            } else {
-                return type.valueOf(obj);
-            }
+          return type.valueOf(table.get(valueSet.getVariableEntity().getIdentifier()).get(variable));
         }
 
         @NotNull
