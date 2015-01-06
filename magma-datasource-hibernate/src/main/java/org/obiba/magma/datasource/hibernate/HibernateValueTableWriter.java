@@ -155,11 +155,13 @@ class HibernateValueTableWriter implements ValueTableWriter {
             .setParameter("valueTableId", valueTable.getValueTableId()) //
             .list();
 
-        int nbBinariesDeleted = session.getNamedQuery("deleteVariableBinaryValues") //
-            .setParameterList("valueSetIds", valueSetIds) //
-            .setParameter("variableId", variableState.getId()) //
-            .executeUpdate();
-        log.debug("Deleted {} binaries from {}", nbBinariesDeleted, valueTable.getName());
+        if (valueSetIds.size() > 0) {
+          int nbBinariesDeleted = session.getNamedQuery("deleteVariableBinaryValues") //
+                  .setParameterList("valueSetIds", valueSetIds) //
+                  .setParameter("variableId", variableState.getId()) //
+                  .executeUpdate();
+          log.debug("Deleted {} binaries from {}", nbBinariesDeleted, valueTable.getName());
+        }
       }
 
       // delete empty value sets
@@ -341,6 +343,8 @@ class HibernateValueTableWriter implements ValueTableWriter {
         binaryValue = createBinaryValue(valueSetValue, inputValue, occurrence);
       } else if(inputValue.isNull()) {
         session.delete(binaryValue);
+      } else {
+        binaryValue.setValue((byte[]) inputValue.getValue());
       }
       if(binaryValue == null) {
         // can be null if empty byte[]
