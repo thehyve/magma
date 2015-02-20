@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.obiba.magma.security.Authorizer;
 import org.obiba.shiro.authc.SudoAuthToken;
@@ -18,9 +19,13 @@ public class ShiroAuthorizer implements Authorizer {
 
   @Override
   public boolean isPermitted(String permission) {
-    boolean p = SecurityUtils.getSubject().isPermitted(permission);
-    log.debug(String.format("isPermitted(%s, %s)==%s", SecurityUtils.getSubject().getPrincipal(), permission, p));
-    SecurityUtils.getSubject().getSession().touch();
+    Subject subject = SecurityUtils.getSubject();
+    boolean p = subject.isPermitted(permission);
+    log.debug(String.format("isPermitted(%s, %s)==%s", subject.getPrincipal(), permission, p));
+    Session session = subject.getSession(false);
+    if (session != null) {
+        session.touch();
+    }
     return p;
   }
 
