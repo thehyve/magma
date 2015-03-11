@@ -19,13 +19,10 @@ public class ShiroAuthorizer implements Authorizer {
 
   @Override
   public boolean isPermitted(String permission) {
-    Subject subject = SecurityUtils.getSubject();
-    boolean p = subject.isPermitted(permission);
-    log.debug(String.format("isPermitted(%s, %s)==%s", subject.getPrincipal(), permission, p));
-    Session session = subject.getSession(false);
-    if (session != null) {
-        session.touch();
-    }
+    boolean p = SecurityUtils.getSubject().isPermitted(permission);
+    log.debug(String.format("isPermitted(%s, %s)==%s", SecurityUtils.getSubject().getPrincipal(), permission, p));
+    Session session = SecurityUtils.getSubject().getSession(false);
+    if(session != null) session.touch();
     return p;
   }
 
