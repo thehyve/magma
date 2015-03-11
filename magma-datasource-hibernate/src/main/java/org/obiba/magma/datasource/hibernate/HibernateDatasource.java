@@ -217,7 +217,7 @@ public class HibernateDatasource extends AbstractDatasource {
     if(datasourceState == null) {
       datasourceState = new DatasourceState(getName());
       sessionFactory.getCurrentSession().save(datasourceState);
-      getSessionFactory().getCurrentSession().refresh(datasourceState); //OPAL-2635
+      sessionFactory.getCurrentSession().refresh(datasourceState); //OPAL-2635
     } else {
       // If already persisted, load the persisted attributes for that datasource.
       for(AttributeState attribute : datasourceState.getAttributes()) {
