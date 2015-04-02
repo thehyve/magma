@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.obiba.magma</groupId>
         <artifactId>magma</artifactId>
-        <version>1.11.5-sesi</version>
+        <version>1.11.6-sesi-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
