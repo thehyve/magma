@@ -406,9 +406,9 @@
     <repositories>
 
         <repository>
-            <id>thehyve.releases</id>
-            <name>The Hyve Releases</name>
-            <url>https://repo.thehyve.nl/content/repositories/releases</url>
+            <id>cmi.releases</id>
+            <name>CMI Releases</name>
+            <url>http://185.9.174.106:8081/nexus/content/repositories/releases</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -417,9 +417,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>thehyve.snapshots</id>
-            <name>The Hyve Snapshots</name>
-            <url>https://repo.thehyve.nl/content/repositories/snapshots</url>
+            <id>cmi.snapshots</id>
+            <name>CMI Snapshots</name>
+            <url>http://185.9.174.106:8081/nexus/content/repositories/snapshots</url>
             <releases>
                 <enabled>false</enabled>
             </releases>
@@ -445,20 +445,20 @@
     <distributionManagement>
 
         <repository>
-            <id>repo.thehyve.nl-releases</id>
-            <url>https://repo.thehyve.nl/content/repositories/releases</url>
+            <id>repo.cmi-releases</id>
+            <url>http://185.9.174.106:8081/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
-            <id>repo.thehyve.nl-snapshots</id>
-            <url>http://repo.thehyve.nl/content/repositories/snapshots</url>
+            <id>repo.cmi-snapshots</id>
+            <url>http://185.9.174.106:8081/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
 
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:git://github.com/thehyve/magma.git</connection>
-        <developerConnection>scm:git:https://github.com/thehyve/magma.git</developerConnection>
-        <url>https://github.com/thehyve/magma</url>
+        <connection>scm:git:git://github.com/cmicognizant/magma.git</connection>
+        <developerConnection>scm:git:https://github.com/cmicognizant/magma.git</developerConnection>
+        <url>https://github.com/cmicognizant/magma</url>
         <tag>master</tag>
     </scm>
 
@@ -471,7 +471,7 @@
 
         <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
 
-        <obiba_commons.version>1.7.2-sesi</obiba_commons.version>
+        <obiba_commons.version>1.7.2-sesi-SNAPSHOT</obiba_commons.version>
         <spring.version>4.1.4.RELEASE</spring.version>
         <hibernate.version>4.3.8.Final</hibernate.version>
         <slf4j.version>1.7.9</slf4j.version>
