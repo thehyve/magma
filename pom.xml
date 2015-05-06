@@ -30,6 +30,7 @@
         <module>magma-xstream</module>
     </modules>
 
+
     <dependencyManagement>
         <dependencies>
             <dependency>
